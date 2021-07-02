@@ -1,3 +1,7 @@
 #!/usr/bin/env ruby
 
+require "thor"
 require "abunai"
+require "abunai/cli"
+
+Abunai::CLI.start ARGV

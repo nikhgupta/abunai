@@ -1,0 +1,59 @@
+---
+cache: ~/.cache/abunai
+
+monitors:
+  - name: macbook
+    uuid: "5C2E8D42-8D34-1841-9F5B-DC325C6DB2E9"
+    priority: 10
+    index: 1
+  - name: lenovo
+    uuid: "5F07D30E-33D6-66B5-B6EA-343FF18B7CB3"
+    priority: 20
+    index: 2
+
+spaces:
+  - name: term
+    icon: 
+    priority: 10
+  - name: web
+    icon: 
+    priority: 20
+    displays:
+      - lenovo
+      - macbook
+  - name: code
+    icon: 
+    priority: 30
+  - name: media
+    icon: 
+    priority: 40
+    displays:
+      - lenovo
+      - macbook
+  - name: files
+    icon: 
+    priority: 50
+  - name: mail
+    icon: "\uFAEF"
+    priority: 60
+    displays:
+      - lenovo
+      - macbook
+  - name: social
+    icon: 
+    priority: 70
+  - name: office
+    icon: 
+    priority: 80
+    displays:
+      - lenovo
+      - macbook
+  - name: settings
+    icon: 
+    priority: 90
+  - name: tools
+    icon: 
+    priority: 100
+    displays:
+      - lenovo
+      - macbook
