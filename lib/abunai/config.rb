@@ -1,18 +1,30 @@
+# frozen_string_literal: true
+
 module Abunai
   class Config
-    include Abunai::Utils
+    include Abunai::Utils::Common
 
     def initialize(router, path: nil)
       @router = router
-      @path = path || Abunai.root.join("example.yml")
+      @path = path || Abunai.root.join("templates", "config.yml")
       @config = YAML.load_file(@path)
       @parsed = false
     end
 
     def parse!
-      find_monitors
-      find_primary_monitor
-      find_spaces
+      return if resolved?
+
+      if File.exist?(config_cache)
+        @config = YAML.load_file(config_cache)
+      else
+        find_monitors
+        find_primary_monitor
+        find_spaces
+        find_bindings
+
+        File.open(config_cache, "wb") { |f| f.puts @config.to_yaml }
+      end
+
       @parsed = true
     end
 
@@ -21,10 +33,22 @@ module Abunai
     end
 
     def cache
-      path = @config.fetch("cache", File.join(ENV["HOME"], ".cache", "abunai"))
-      FileUtils.mkdir_p(File.dirname(path))
+      path = Pathname.new(get_config(:generate_in)).expand_path
+      path = path.join(".cache", "abunai.yaml")
+      FileUtils.mkdir_p(path.dirname) unless path.dirname.directory?
 
-      path
+      path.to_s
+    end
+
+    def config_cache
+      return @config_cache_path if @config_cache_path
+
+      hash = Digest::MD5.hexdigest(@config.to_yaml)
+      path = Pathname.new(get_config(:generate_in)).expand_path
+      path = path.join(".cache", "config-#{hash}.yaml")
+      FileUtils.mkdir_p(path.dirname) unless path.dirname.directory?
+
+      @config_cache_path = path.to_s
     end
 
     def available_monitors
@@ -48,11 +72,43 @@ module Abunai
       raise Abunai::Error, message
     end
 
+    def id_for_yabai_space(space)
+      space = label_for_yabai_space(space)
+      space_names.each.with_index do |sn, i|
+        return i + 1 if space == sn
+      end
+    end
+
     def display_for_yabai_space(space)
       @config["spaces"][label_for_yabai_space(space)]["on_display"]
     end
 
     protected
+
+    def find_bindings
+      @config["binding_subjects"] = @config["bindings"]["subjects"].map do |subject|
+        key = subject.scan(/_(.)_/)[0][0]
+        name = subject.gsub("_", "")
+        [name, { key: key, name: name }]
+      end.to_h
+
+      @config["binding_verbs"] = @config["bindings"]["verbs"].map do |verb, subs|
+        name = verb.gsub("_", "")
+        key = verb.scan(/_(.)_/)[0][0]
+        data = subs.to_s.chars.map do |char|
+          @config["binding_subjects"].detect { |_k, v| v[:key] == char }
+        end
+        [name, { key: key, name: name, subjects: data.to_h }]
+      end.to_h
+
+      @config["binding_directions"] = @config["bindings"]["directions"].map do |key, item|
+        item = { "direction" => item, "keycode" => key } if item.is_a?(String)
+        item = item.merge("real" => key, "real_direction" => item["direction"])
+        item["direction"] = item["direction"].gsub(/\d+$/, "")
+        item["keycode"] = "0x#{item["keycode"].to_s(16).upcase}" if item["keycode"].is_a?(Numeric)
+        [item["keycode"], item]
+      end.to_h
+    end
 
     def find_monitors
       @config["monitors"] = @config["monitors"].map do |monitor|
@@ -78,10 +134,14 @@ module Abunai
       end.to_h
     end
 
-    def method_missing(m, *a, **b, &c)
-      return @config[m.to_s] if @config.key?(m.to_s)
+    def method_missing(method, *args, **kwargs, &block)
+      return @config[method.to_s] if @config.key?(method.to_s)
 
       super
+    end
+
+    def respond_to_missing?(method, *args, **kwargs, &block)
+      super || @config.key?(method.to_s)
     end
   end
 end

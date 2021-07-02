@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 module Abunai
   class Base
-    include Abunai::Utils
+    include Abunai::Utils::Common
     attr_reader :skhd, :yabai, :spacebar, :config
 
     def initialize(*args, **kwargs, &block)
       @router = self
       @config = Abunai::Config.new(self)
-
       @skhd = Abunai::Services::Skhd.new(self, *args, **kwargs, &block)
       @yabai = Abunai::Services::Yabai.new(self, *args, **kwargs, &block)
       @spacebar = Abunai::Services::Spacebar.new(self, *args, **kwargs, &block)
@@ -22,6 +23,8 @@ module Abunai
 
       with_services { |_name, service| service.after_config_parse }
       save
+
+      self
     end
 
     # save current state to cache

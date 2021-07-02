@@ -1,0 +1,256 @@
+---
+script_dir: ~/.bin/macos
+generate_in: ~/.config/abunai/
+
+alfred:
+  cheatsheet: true
+  workflow: com.nikhgupta.overlay
+  trigger: com.koekeshiya.skhd
+
+monitors:
+  - name: macbook
+    uuid: "5C2E8D42-8D34-1841-9F5B-DC325C6DB2E9"
+    index: 1
+    priority: 10
+
+  - name: lenovo
+    uuid: "5F07D30E-33D6-66B5-B6EA-343FF18B7CB3"
+    index: 2
+    priority: 20
+
+colors:
+  feedback: 0xb2ebdbb2
+  active_window_border: 0x00444444
+  normal_window_border: 0x00444444
+
+yabairc:
+  debug: true
+  layout: float
+
+skhdrc:
+  hyper_key: f19
+
+spaces:
+  - name: term
+    icon: 
+    priority: 10
+    layout: bsp
+    padding: 10
+    follow: true
+    apps:
+      - kitty
+      - Alacritty
+      - iTerm2
+      - Terminal
+
+  - name: web
+    icon: 
+    priority: 20
+    displays:
+      - lenovo
+      - macbook
+    apps:
+      - Safari
+      - Firefox
+      - Google Chrome
+
+  - name: code
+    icon: 
+    priority: 30
+    layout: stack
+    apps:
+      - Atom
+      - VimR
+      - MacVim
+      - Emacs
+      - ^Code$
+      - Visual Studio Code
+      - TextEdit
+      - Notes
+      - nvALT
+
+  - name: media
+    icon: 
+    priority: 40
+    displays:
+      - lenovo
+      - macbook
+    apps:
+      - VLC
+      - match: TV
+        follow: false
+      - match: Music
+        follow: false
+      - match: QuickTime
+        follow: false
+      - match: Spotify
+        follow: false
+
+  - name: files
+    icon: 
+    priority: 50
+    layout: bsp
+    padding: 10
+    apps:
+      - Photos
+      - Finder
+      - Dropbox
+      - OneDrive
+      - Android File Transfer
+      - match: WebTorrent
+        follow: false
+
+  - name: mail
+    icon: "\uFAEF"
+    priority: 60
+    displays:
+      - lenovo
+      - macbook
+    apps:
+      - Mail
+      - Reminders
+      - Asana
+      - match: Flotato
+        title: ^\s*Gmail\s*$
+      - match: Flotato
+        title: ^\s*Asana\s*$
+
+  - name: social
+    icon: 
+    priority: 70
+    layout: bsp
+    padding: 10
+    apps:
+      - Skype
+      - Slack
+      - FaceTime
+      - match: Messages
+        follow: false
+      - match: Discord
+        follow: false
+      - match: Telegram
+        follow: false
+      - match: Flotato
+        title: ^\s*WhatsApp\s*$
+
+  - name: office
+    icon: 
+    priority: 80
+    displays:
+      - lenovo
+      - macbook
+    apps:
+      - Microsoft Word
+      - iMovie
+      - Keynote
+      - Pages
+      - Numbers
+      - Calendar
+      - match: Flotato
+        title: ^\s*Notion\s*$
+
+  - name: settings
+    icon: 
+    priority: 90
+    apps:
+      - Home
+      - Find My
+      - App Store
+      - Time Machine
+      - BetterTouchTool
+      - Activity Monitor
+      - match: Contacts
+        manage: false
+        border: false
+
+  - name: tools
+    icon: 
+    priority: 100
+    displays:
+      - lenovo
+      - macbook
+    apps:
+      - Maps
+      - 1Password 7
+      - Automator
+      - LastPass
+      - Sequel Pro
+      - Postman
+      - Sourcetree
+      - Simulator
+      - TablePlus
+      - Upwork
+
+apps:
+  - match: Preview
+    manage: false
+    border: false
+    sticky: true
+  - match: Calculator
+    manage: false
+    border: false
+    sticky: true
+  - match: ^System Preferences$
+    manage: false
+    border: false
+
+bindings:
+  default:
+    help: default mode
+  active:
+    help: listening for hotkeys
+  subjects:
+    - _w_indow
+    - _s_pace
+    - _d_isplay
+    - _f_inder
+    - scri_p_t
+    - _r_estart
+    - _a_pp
+  verbs:
+    _f_ocus: wsd
+    _s_wap: wsd
+    _m_ove: wsd
+    _g_rid:
+    _r_esize:
+    _t_oggle: wsd
+    _l_aunch: frap
+  directions:
+    h: west
+    j: south
+    k: north
+    l: east
+    m: largest
+    "<":
+      keycode: 0x2B
+      direction: prev1
+    ">":
+      keycode: 0x2F
+      direction: next1
+    "[":
+      keycode: 0x21
+      direction: prev2
+    "]":
+      keycode: 0x1E
+      direction: next2
+    "/":
+      keycode: 0x2A
+      direction: recent1
+    '\':
+      keycode: 0x2C
+      direction: recent2
+    "=":
+      keycode: 0x18
+      secondary: true
+      direction: equalize
+  grids:
+    h: "1:2:0:0:1:1" # left
+    j: "2:1:0:1:1:1" # bottom
+    k: "2:1:0:0:1:1" # top
+    l: "1:2:1:0:1:1" # right
+    m: "1:1:0:0:1:1" # max
+    with_alt:
+      h: "2:2:0:0:1:1" # top left
+      j: "2:2:0:1:1:1" # bottom left
+      k: "2:2:1:0:1:1" # bottom right
+      l: "2:2:1:1:1:1" # top right
