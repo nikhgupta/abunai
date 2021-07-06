@@ -42,7 +42,7 @@ module Abunai
       def ensure_spaces
         return if current_spaces_count >= spaces_count
 
-        (spaces_count - current_spaces_count).times { execute "space --create" }
+        (spaces_count - current_spaces_count).times { __run "yabai -m space --create" }
       end
 
       def ensure_labels
@@ -57,15 +57,16 @@ module Abunai
       end
 
       def reorganize_spaces
-        current_spaces_count.times do |idx|
-          yabai.move_space_to_display idx, config.display_for_yabai_space(idx)["uuid"], uuid: true
+        state[:spaces].map do |space|
+          display = config.display_for_yabai_space(space["label"])
+          yabai.move_space_to_display space["label"], display["uuid"], uuid: true
         end
 
         router.load[:yabai][:spaces].each do |space|
           space["windows"].each do |window|
             next unless window_ids.include?(window)
 
-            yabai.move_window_to_space(window, space["label"] == "s" ? "s1" : space["label"])
+            yabai.move_window_to_space(window, space["label"])
           end
         end
 

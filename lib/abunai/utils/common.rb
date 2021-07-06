@@ -32,6 +32,7 @@ module Abunai
 
         raise stderr.strip
       end
+      alias __run run
 
       def find_all(objects, key, value)
         objects.map { _1 if _1[key] == value }.compact
